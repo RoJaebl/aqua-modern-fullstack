@@ -1,0 +1,20 @@
+{
+  "include": ["src"],
+  "exclude": ["node_modules", "src/client"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "module": "CommonJS",
+    "target": "ES6",
+    "lib": ["DOM", "DOM.Iterable", "ES6"],
+    "allowJs": true,
+    "checkJs": true,
+    "strict": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "isolatedModules": true
+  }
+}
