@@ -1,8 +1,8 @@
 {
   "include": ["src"],
-  "exclude": ["node_modules", "src/client"],
+  "exclude": ["node_modules", "src/client", "config"],
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "build",
     "module": "CommonJS",
     "target": "ES6",
     "lib": ["DOM", "DOM.Iterable", "ES6"],

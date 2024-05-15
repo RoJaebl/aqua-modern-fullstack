@@ -5,6 +5,7 @@ import rootRouter from "./routers/root.router";
 import userRouter from "./routers/user.router";
 import videoRouter from "./routers/video.router";
 import localsMiddleware from "./middlewares/locals.middleware";
+import proxy from "express-http-proxy";
 
 const app = express();
 
@@ -22,7 +23,7 @@ app.use(
 );
 
 app.use(localsMiddleware);
-
+app.use("/public", proxy("http://localhost:3000"));
 app.use("/", rootRouter);
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);
