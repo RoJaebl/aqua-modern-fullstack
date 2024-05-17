@@ -1,12 +1,12 @@
 import merge from "webpack-merge";
 import commonConfig from "./webpack.common";
-import { plugins } from "./plugins";
-import { commonRules } from "./rules";
+import { miniCssPlugin, multiHtmlPlugin, analyzerPlugin } from "./plugins";
+import { scriptRules, styleRules, pugRules } from "./rules";
 
 module.exports = merge(commonConfig, {
   mode: "production",
   module: {
-    rules: commonRules,
+    rules: [scriptRules, styleRules, pugRules],
   },
-  plugins,
+  plugins: [miniCssPlugin, ...multiHtmlPlugin],
 });

@@ -1,4 +1,4 @@
 {
-  "ignore": ["src/client"],
+  "ignore": ["src/client", "config"],
   "exec": "babel-node -x .ts src/init.ts"
 }

@@ -1,0 +1,9 @@
+extends ../base
+
+block content 
+  h4 Change Title of Video
+  form(method="POST")
+    input(name="title" type="text" placeholder="콘텐츠 제목")
+    input(name="description" type="text" placeholder="콘텐츠 설명")
+    input(name="hashtags" type="text" placeholder="콤마(,)로 구분하여 해쉬 입력")
+    input(value="save" type="submit" uppercase)
