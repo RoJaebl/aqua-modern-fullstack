@@ -23,19 +23,12 @@ let videos: VideoModel[] = [
 ];
 
 export const home: RequestHandler = (req, res) => {
-  Object.assign((res as AppResponse).locals, {
-    pageTitle: "Home",
-    videos,
-  });
+  const { locals } = res as AppResponse;
+  locals.pageTitle = "Home";
+  locals.videos = videos;
   return res.render("videos/home");
 };
-export const watch: RequestHandler = (req, res) => {
-  const {
-    params: { id: videoId },
-  } = req;
-  (res as AppResponse).locals.pageTitle = "Watch";
-  return res.render("videos/watch");
-};
+export const watch: RequestHandler = (req, res) => {};
 
 export const edit: RequestHandler = (req, res) => {
   (res as AppResponse).locals.pageTitle = "Edit";

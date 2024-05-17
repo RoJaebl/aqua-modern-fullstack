@@ -6,6 +6,7 @@ import userRouter from "./routers/user.router";
 import videoRouter from "./routers/video.router";
 import localsMiddleware from "./middlewares/locals.middleware";
 import proxy from "express-http-proxy";
+import MongoStore from "connect-mongo";
 
 const app = express();
 
@@ -17,8 +18,11 @@ app.use(express.json());
 app.use(
   session({
     secret: process.env.COOKIE_SECRET + "",
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.DB_URL,
+    }),
   })
 );
 
