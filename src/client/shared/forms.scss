@@ -1,0 +1,24 @@
+form {
+  @apply flex flex-col items-center max-w-[420px] my-0 mx-auto;
+  @apply p-[30px] bg-primary-bg rounded-[10px] border border-solid border-white/10;
+}
+
+input:not([type="range"]) {
+  @apply px-[20px] py-[15px]  bg-black mb-[5px] text-base text-white w-full;
+  @apply border border-solid border-white/20 rounded-[5px];
+  @apply placeholder:text-white/70;
+}
+
+input[type="submit"],
+.social__btn {
+  @apply px-5 py-3 bg-white text-center text-primary-color cursor-pointer  border-none rounded-md;
+  @apply focus:outline-none disabled:pointer-events-none disabled:opacity-50;
+}
+
+.form-invalid {
+  @apply border-rose-500 border-2 #{!important};
+}
+
+.error-message {
+  @apply text-xs text-rose-500 self-start;
+}

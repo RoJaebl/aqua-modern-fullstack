@@ -1,0 +1,21 @@
+header {
+  @apply flex justify-between items-center px-[50px] py-[20px];
+  .header__logo {
+    @apply text-[38px] text-primary-color;
+  }
+  ul {
+    @apply flex justify-between;
+    li {
+      @apply ml-8 text-sm font-semibold uppercase;
+    }
+    i {
+      @apply text-base;
+    }
+  }
+  .header__btn {
+    @apply bg-white px-[10px] py-[5px] rounded-md text-primary-bg;
+  }
+  .header__avatar {
+    @apply w-[38px] h-[38px] border-[50%];
+  }
+}

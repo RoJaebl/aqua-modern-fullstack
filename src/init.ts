@@ -1,9 +1,6 @@
-import dotenv from "dotenv";
+import "dotenv/config.js";
+import "./db.ts";
 import app from "./server";
-
-dotenv.config({
-  path: process.env.NODE_ENV === "production" ? "./.prod.env" : "./.dev.env",
-});
 
 app.listen(process.env.PORT, () => {
   console.log(

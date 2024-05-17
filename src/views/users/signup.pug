@@ -1,0 +1,18 @@
+extends ../base
+
+block content 
+  form(method="POST") 
+    span.error-message #{error && error.message ? error.message: "" }
+    input(name="name" type="text"  placeholder="Name" required value=`${formData && formData.name ? formData.name : ""}`)
+    span.error-message #{error && error.user ? error.user : "" }
+    input(name="email" type="email"  placeholder="Email" required value=`${formData && formData.email ? formData.email : ""}`)
+    input(name="username" type="text"  placeholder="Username" required value=`${formData && formData.username ? formData.username : ""}`)
+    span.error-message #{error && error.password ? error.password : "" }
+    input(name="password" type="password" required placeholder="Password") 
+    input(name="password2" type="password"  placeholder="Confirm Password" required)
+    input(name="location",type="text"  placeholder="Location" required value=`${formData && formData.location ? formData.location : ""}`)
+    input(type="submit", value="sign in")
+    include ../partials/social-signin
+  div.auth-switch
+    span Already have an account? 
+    a(href="/signin") Log in now &rarr;

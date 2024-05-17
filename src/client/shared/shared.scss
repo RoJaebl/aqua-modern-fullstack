@@ -1,0 +1,6 @@
+@import "./main.scss";
+@import "./forms.scss";
+
+.empty__message {
+  @apply mb-[50px] text-[18px];
+}

@@ -1,0 +1,14 @@
+.video-mixin {
+  .video-mixin__thumb {
+    @apply h-[140px] w-full rounded-md bg-black bg-cover bg-center;
+  }
+  .video-mixin__data {
+    @apply py-0 px-[15px];
+    .video-mixin__title {
+      @apply text-[18px] block mt-[10px];
+    }
+    .video-mixin__meta {
+      @apply mt-[5px] text-[12px];
+    }
+  }
+}
