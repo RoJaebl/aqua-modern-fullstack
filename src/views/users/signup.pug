@@ -2,7 +2,7 @@ extends ../base
 
 block content 
   form(method="POST") 
-    span.error-message #{error && error.message ? error.message: "" }
+    span.error-message #{error && error.message ? error.message : "" }
     input(name="name" type="text"  placeholder="Name" required value=`${formData && formData.name ? formData.name : ""}`)
     span.error-message #{error && error.user ? error.user : "" }
     input(name="email" type="email"  placeholder="Email" required value=`${formData && formData.email ? formData.email : ""}`)
