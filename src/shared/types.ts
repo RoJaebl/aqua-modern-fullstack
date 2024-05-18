@@ -4,24 +4,28 @@ import User from "../models/user.model";
 import { Session } from "inspector";
 import { Cookie, SessionData } from "express-session";
 
-export type VideoModel = {
+type TVideoModel = {
   title: String;
   id: Number;
   description: String;
   hashtags: String;
 };
-export type LocalsType = {
+interface ILocals extends TLocalsSession {
   pageTitle?: String;
   siteName?: String;
   error?: Record<any, String>;
-  videos?: VideoModel[];
+  videos?: TVideoModel[];
   formData?: Record<any, String>;
-};
+}
 export interface AppResponse extends Response {
-  locals: LocalsType;
+  locals: ILocals;
 }
 
-export interface SessionType extends Partial<SessionData> {
+type TLocalsSession = {
+  loggedIn?: Boolean;
+  user?: typeof User.schema.obj;
+};
+interface ISession extends Partial<SessionData> {
   id: string;
   cookie: Cookie;
   regenerate(callback: (err: any) => void): this;
@@ -31,10 +35,7 @@ export interface SessionType extends Partial<SessionData> {
   save(callback?: (err: any) => void): this;
   touch(): this;
 }
-export interface SessionType {
-  loggedIn: Boolean;
-  user: typeof User.schema.obj;
-}
+interface ISession extends TLocalsSession {}
 export interface AppRequest extends Request {
-  session: SessionType;
+  session: ISession;
 }
