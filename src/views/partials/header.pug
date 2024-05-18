@@ -6,13 +6,15 @@ header
       li
         a(href="/search")
           i.fas.fa-search
-      li
-        a(href="/videos/upload") Upload Video 
-      li
-        a(href="/users/edit") Edit Profile
-      li
-        a(href="/users/signout") Sign out
-      li
-        a(href="/signin") Sign in
-      li
-        a(href="/signup").header__btn Sign up
+      if loggedIn
+        li
+          a(href="/videos/upload") Upload Video 
+        li
+          a(href="/users/edit") Edit Profile
+        li
+          a(href="/users/signout") Sign out
+      else 
+        li
+          a(href="/signin") Sign in
+        li
+          a(href="/signup").header__btn Sign up

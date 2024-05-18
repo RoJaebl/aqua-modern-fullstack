@@ -76,5 +76,10 @@ export const postSignup: RequestHandler = async (req, res) => {
     return res.status(400).render("users/signup");
   }
 };
-export const signout: RequestHandler = (req, res) => {};
+export const signout: RequestHandler = (req, res) => {
+  const { session } = req as AppRequest;
+  delete session.loggedIn;
+  delete session.user;
+  return res.redirect("/");
+};
 export const profile: RequestHandler = (req, res) => {};
