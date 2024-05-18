@@ -39,3 +39,11 @@ interface ISession extends TLocalsSession {}
 export interface AppRequest extends Request {
   session: ISession;
 }
+
+export type TGHEmail = {
+  email: String;
+  primary: Boolean;
+  verified: Boolean;
+  visibility: null;
+};
+export type TGHEmails = TGHEmail[];

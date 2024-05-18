@@ -1,7 +1,8 @@
 import { RequestHandler } from "express";
-import { AppRequest, AppResponse } from "../shared/types";
+import { AppRequest, AppResponse, TGHEmail, TGHEmails } from "../shared/types";
 import User from "../models/user.model";
 import bcrypt from "bcrypt";
+import { URLSearchParams } from "url";
 
 export const signin: RequestHandler = (req, res) => {
   const { locals } = res as AppResponse;
@@ -22,7 +23,7 @@ export const postSignin: RequestHandler = async (req, res) => {
     };
     return res.status(400).render("users/signin");
   }
-  if (!bcrypt.compare(password, user.password)) {
+  if (!bcrypt.compare(password, user.password!)) {
     locals.error = {
       user: "사용자 비밀번호가 맞지 않습니다.",
     };
@@ -82,4 +83,74 @@ export const signout: RequestHandler = (req, res) => {
   delete session.user;
   return res.redirect("/");
 };
+export const ghSignin: RequestHandler = (req, res) => {
+  const baseUrl = "https://github.com/login/oauth/authorize";
+  const params = new URLSearchParams({
+    client_id: process.env.GH_OAUTH_ID!,
+    allow_signup: "false",
+    scope: "read:user user:email",
+  }).toString();
+  return res.redirect(`${baseUrl}?${params}`);
+};
+export const ghSigninAccess: RequestHandler = async (req, res) => {
+  const {
+    query: { code },
+  } = req as AppRequest;
+  const { session } = req as AppRequest;
+
+  try {
+    const baseUrl = "https://github.com/login/oauth/access_token";
+    const params = new URLSearchParams({
+      client_id: process.env.GH_OAUTH_ID!,
+      client_secret: process.env.GH_OAUTH_SECRET!,
+      code: code + "",
+    }).toString();
+    const { access_token, token_type } = await fetch(`${baseUrl}?${params}`, {
+      method: "POST",
+      headers: { Accept: "application/json" },
+    }).then((data) => data.json());
+
+    if (!access_token) return res.redirect("/signin");
+
+    const apiUrl = "https://api.github.com";
+    const {
+      avatar_url: avatarUrl,
+      name,
+      login: username,
+      location,
+    } = await fetch(`${apiUrl}/user`, {
+      headers: {
+        Authorization: `${token_type} ${access_token}`,
+      },
+    }).then((data) => data.json());
+    const emails = await fetch(`${apiUrl}/user/emails`, {
+      headers: {
+        Authorization: `${token_type} ${access_token}`,
+      },
+    }).then<TGHEmails>((data) => data.json());
+    const { email } =
+      emails.find(({ primary, verified }) => primary && verified) ?? {};
+
+    if (!email) return res.redirect("/signin");
+
+    let user = await User.findOne({ email });
+    if (!user)
+      user = await User.create({
+        username,
+        email,
+        name,
+        avatarUrl,
+        location,
+        password: "",
+        socialOnly: true,
+      });
+
+    session.loggedIn = true;
+    session.user = user;
+    return res.redirect("/");
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const profile: RequestHandler = (req, res) => {};
