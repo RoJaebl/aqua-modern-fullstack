@@ -1,10 +1,10 @@
 form {
-  @apply flex flex-col items-center max-w-[420px] my-0 mx-auto;
+  @apply flex flex-col max-w-[420px] my-0 mx-auto items-stretch justify-center;
   @apply p-[30px] bg-primary-bg rounded-[10px] border border-solid border-white/10;
 }
 
 input:not([type="range"]) {
-  @apply px-[20px] py-[15px]  bg-black mb-[5px] text-base text-white w-full;
+  @apply px-[20px] py-[15px]  bg-black mb-[5px] text-base text-white;
   @apply border border-solid border-white/20 rounded-[5px];
   @apply placeholder:text-white/70;
 }
@@ -21,4 +21,11 @@ input[type="submit"],
 
 .error-message {
   @apply text-xs text-rose-500 self-start;
+}
+
+.social-login {
+  @apply border-t border-solid border-white/20 pt-[30px] mt-[30px];
+  a {
+    @apply block;
+  }
 }
