@@ -1,20 +1,10 @@
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+import "./pages";
+import pages from "./pages";
 
-const htmlPages = [
-  "base",
-  "users/signin",
-  "users/signup",
-  "videos/home",
-  "videos/edit",
-  "videos/watch",
-  "partials/footer",
-  "partials/header",
-  "partials/social-signin",
-  "mixins/video",
-];
-const multiHtmlWebpackPlugin = htmlPages.map(
+const multiHtmlWebpackPlugin = pages.map(
   (name) =>
     new HtmlWebpackPlugin({
       template: `./src/views/${name}.pug`,
