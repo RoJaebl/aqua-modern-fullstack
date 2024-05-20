@@ -4,6 +4,7 @@ import User from "../models/user.model";
 import bcrypt from "bcrypt";
 import { URLSearchParams } from "url";
 import fs from "fs";
+import { videos } from "./video.controller";
 
 export const signin: RequestHandler = (req, res) => {
   const { locals } = res;
@@ -150,7 +151,7 @@ export const ghSigninAccess: RequestHandler = async (req, res) => {
 };
 export const userProfile: RequestHandler = (req, res) => {
   const { locals } = res;
-  locals.pageTitle = " Edit Profile";
+  locals.pageTitle = "Profile";
   return res.render("users/profile");
 };
 export const postUserProfile: RequestHandler = async (req, res) => {
@@ -167,7 +168,7 @@ export const postUserProfile: RequestHandler = async (req, res) => {
     body: { name, email, username, location },
     file,
   } = req;
-  locals.pageTitle = " Edit Profile";
+  locals.pageTitle = "Profile";
 
   const isEmail = _email !== email && (await User.exists({ email }));
   const isUsername =
@@ -197,4 +198,9 @@ export const postUserProfile: RequestHandler = async (req, res) => {
   req.session.user = updateUser!;
   return res.redirect(`profile`);
 };
-export const userSummary: RequestHandler = (req, res) => {};
+export const userSummary: RequestHandler = (req, res) => {
+  const { locals } = res;
+  locals.pageTitle = "Summary";
+  locals.videos = videos;
+  return res.render("users/summary");
+};

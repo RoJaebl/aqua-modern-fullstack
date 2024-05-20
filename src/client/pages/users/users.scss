@@ -1,10 +1,9 @@
-.profile {
-  @apply flex flex-col items-center mb-[50px] mx-auto max-w-[420px];
-  > * {
-    @apply mb-[10px];
-  }
+@import "./mixins.scss";
+
+.avatar-container {
+  @apply flex flex-col items-center mx-auto max-w-[420px];
   h3 {
-    @apply text-[18px];
+    @apply text-[18px] mt-[8px];
   }
 }
 
@@ -14,6 +13,6 @@
     @apply underline;
   }
 }
-.profile__avatar {
-  @apply w-[150px] h-[150px] rounded-[50%];
-}
+
+@include avatar();
+@include avatar("header", 38px);

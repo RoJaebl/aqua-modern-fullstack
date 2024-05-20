@@ -4,7 +4,7 @@ header {
     @apply text-[38px] text-primary-color;
   }
   ul {
-    @apply flex justify-between;
+    @apply flex justify-between items-center;
     li {
       @apply ml-8 text-sm font-semibold uppercase;
     }
@@ -14,8 +14,5 @@ header {
   }
   .header__btn {
     @apply bg-white px-[10px] py-[5px] rounded-md text-primary-bg;
-  }
-  .header__avatar {
-    @apply w-[38px] h-[38px] border-[50%];
   }
 }

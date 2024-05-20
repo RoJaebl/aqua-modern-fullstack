@@ -1,0 +1,5 @@
+@mixin avatar($name: "image", $size: 150px) {
+  .avatar__#{$name} {
+    @apply w-[#{$size}] h-[#{$size}] rounded-[50%];
+  }
+}
