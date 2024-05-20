@@ -1,9 +1,19 @@
 import express from "express";
-import { profile, signout } from "../controllers/user.controller";
+import {
+  userSummary,
+  signout,
+  userProfile,
+  postUserProfile,
+} from "../controllers/user.controller";
+import { avatarUpload } from "../middlewares/multer.middleware";
 
 const userRouter = express.Router();
 
 userRouter.route("/signout").get(signout);
-userRouter.route("/:id").get(profile);
+userRouter
+  .route("/:id/profile")
+  .get(userProfile)
+  .post(avatarUpload.single("avatar"), postUserProfile);
+userRouter.route("/:id").get(userSummary);
 
 export default userRouter;

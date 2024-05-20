@@ -1,7 +1,17 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
-const userSchema = new mongoose.Schema({
+export interface IUserSchemaDefinition {
+  email: string;
+  avatarUrl?: string;
+  socialOnly: boolean;
+  username: string;
+  password?: string;
+  name: string;
+  location?: string;
+  videos: mongoose.Schema.Types.ObjectId[];
+}
+const userSchema = new mongoose.Schema<IUserSchemaDefinition>({
   email: { type: String, required: true, unique: true },
   avatarUrl: String,
   socialOnly: { type: Boolean, default: false },
