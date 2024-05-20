@@ -1,15 +1,8 @@
 extends ../base
+include ../mixins/avatar
 
 block content
-  div.profile
-    if user.socialOnly
-      img(src=user.avatarUrl).profile__avatar
-    else 
-      if user.avatarUrl
-        img(src=`/${user.avatarUrl}`).profile__avatar
-      else
-        div 😎
-    h3=user.name
+  +avatar()(class="mb-[50px]")
     span.error-message #{error && error.user ? error.user : "" }
   form(method="POST", enctype="multipart/form-data")
     if !user.socialOnly
