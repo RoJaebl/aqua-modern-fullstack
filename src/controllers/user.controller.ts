@@ -74,9 +74,7 @@ export const postSignup: RequestHandler = async (req, res) => {
   }
 };
 export const signout: RequestHandler = (req, res) => {
-  const { session } = req;
-  delete session.loggedIn;
-  delete session.user;
+  req.session.destroy((err) => {});
   return res.redirect("/");
 };
 export const ghSignin: RequestHandler = (req, res) => {
@@ -157,22 +155,23 @@ export const userProfile: RequestHandler = (req, res) => {
 export const postUserProfile: RequestHandler = async (req, res) => {
   const { locals } = res;
   const {
-    session: {
-      user: {
-        _id,
-        email: _email,
-        username: _username,
-        avatarUrl: _avatarUrl,
-      } = {},
-    },
+    params: { id: userId },
     body: { name, email, username, location },
     file,
   } = req;
   locals.pageTitle = "Profile";
 
-  const isEmail = _email !== email && (await User.exists({ email }));
+  const user = await User.findById(userId);
+  if (!user) {
+    locals.error = {
+      user: "사용자를 찾을 수 없습니다.",
+    };
+    return res.status(404).render("404");
+  }
+
+  const isEmail = user.email !== email && (await User.exists({ email }));
   const isUsername =
-    _username !== username && (await User.exists({ username }));
+    user.username !== username && (await User.exists({ username }));
   if (isEmail || isUsername) {
     locals.error = {
       user: "이름이나 이메일 중 이미 존제합니다.",
@@ -180,11 +179,11 @@ export const postUserProfile: RequestHandler = async (req, res) => {
     return res.status(400).render("users/profile");
   }
 
-  file && _avatarUrl && fs.rmSync(_avatarUrl);
-  const avatarUrl = file ? file.path : _avatarUrl;
+  file && user.avatarUrl && fs.rmSync(user.avatarUrl);
+  const avatarUrl = file ? file.path : user.avatarUrl;
 
   const updateUser = await User.findByIdAndUpdate(
-    _id,
+    user.id,
     {
       avatarUrl,
       name,
@@ -198,9 +197,20 @@ export const postUserProfile: RequestHandler = async (req, res) => {
   req.session.user = updateUser!;
   return res.redirect(`profile`);
 };
-export const userSummary: RequestHandler = (req, res) => {
+export const userSummary: RequestHandler = async (req, res) => {
+  const {
+    params: { id: userId },
+  } = req;
   const { locals } = res;
   locals.pageTitle = "Summary";
+
+  if (!(await User.findById(userId))) {
+    locals.error = {
+      user: "사용자를 찾을 수 없습니다.",
+    };
+    return res.status(404).render("404");
+  }
+
   locals.videos = videos;
   return res.render("users/summary");
 };

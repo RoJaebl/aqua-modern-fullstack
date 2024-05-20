@@ -8,12 +8,24 @@ import {
   signin,
   signup,
 } from "../controllers/user.controller";
+import { restrictMiddleware } from "../middlewares/gaurd.middlware";
 
 const rootRouter = express.Router();
 
 rootRouter.route("/").get(home);
-rootRouter.route("/signup").get(signup).post(postSignup);
-rootRouter.route("/signin").get(signin).post(postSignin);
-rootRouter.route("/signin/oauth/github").get(ghSignin);
-rootRouter.route("/signin/oauth/github/access").get(ghSigninAccess);
+rootRouter
+  .route("/signup")
+  .all(restrictMiddleware)
+  .get(signup)
+  .post(postSignup);
+rootRouter
+  .route("/signin")
+  .all(restrictMiddleware)
+  .get(signin)
+  .post(postSignin);
+rootRouter.route("/signin/oauth/github").all(restrictMiddleware).get(ghSignin);
+rootRouter
+  .route("/signin/oauth/github/access")
+  .all(restrictMiddleware)
+  .get(ghSigninAccess);
 export default rootRouter;
