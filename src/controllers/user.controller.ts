@@ -1,64 +1,59 @@
 import { RequestHandler } from "express";
-import { AppRequest, AppResponse, TGHEmail, TGHEmails } from "../shared/types";
+import { TGHEmails } from "../shared/types";
 import User from "../models/user.model";
 import bcrypt from "bcrypt";
 import { URLSearchParams } from "url";
+import fs from "fs";
 
 export const signin: RequestHandler = (req, res) => {
-  const { locals } = res as AppResponse;
+  const { locals } = res;
   locals.pageTitle = "Sign in";
   return res.render("users/signin");
 };
 export const postSignin: RequestHandler = async (req, res) => {
-  const { locals } = res as AppResponse;
-  const { session } = req as AppRequest;
-
+  const { locals } = res;
+  const {
+    session,
+    body: { username, password },
+  } = req;
   locals.pageTitle = "Sign in";
-  const { username, password } = req.body;
 
   const user = await User.findOne({ username, socialOnly: false });
-  if (!user) {
+  const isCompare = user && (await bcrypt.compare(password, user?.password!));
+  if (!user || !isCompare) {
     locals.error = {
-      user: "사용자가 존제하지 않습니다.",
+      ...(!user && { user: "사용자가 존제하지 않습니다." }),
+      ...(!isCompare && user && { user: "사용자 비밀번호가 맞지 않습니다." }),
     };
     return res.status(400).render("users/signin");
   }
-  if (!bcrypt.compare(password, user.password!)) {
-    locals.error = {
-      user: "사용자 비밀번호가 맞지 않습니다.",
-    };
-    return res.status(400).render("users/signin");
-  }
+
   session.loggedIn = true;
   session.user = user;
   return res.redirect("/");
 };
 export const signup: RequestHandler = (req, res) => {
-  const { locals } = res as AppResponse;
+  const { locals } = res;
   locals.pageTitle = "Sign up";
   return res.render("users/signup");
 };
 export const postSignup: RequestHandler = async (req, res) => {
-  const { locals } = res as AppResponse;
-  locals.pageTitle = "Sign up";
+  const { locals } = res;
   const { name, email, username, password, password2, location } = req.body;
+  locals.pageTitle = "Sign up";
   locals.formData = { name, email, username, location };
 
   const isUser = await User.exists({ $or: [{ username }, { email }] });
-  if (isUser) {
+  if (isUser || password !== password2) {
     locals.error = {
-      user: "이름이나 이메일 중 이미 존제합니다.",
-    };
-    delete locals.formData?.username;
-    delete locals.formData?.email;
-    return res.status(400).render("users/signup");
-  }
-  if (password !== password2) {
-    locals.error = {
-      password: "비밀번호가 서로 일치하지 않습니다.",
+      ...(password !== password2 && {
+        password: "비밀번호가 서로 일치하지 않습니다.",
+      }),
+      ...(isUser && { user: "이름이나 이메일 중 이미 존제합니다." }),
     };
     return res.status(400).render("users/signup");
   }
+
   try {
     await User.create({
       name,
@@ -70,7 +65,7 @@ export const postSignup: RequestHandler = async (req, res) => {
       videos: [],
     });
     return res.redirect("/signin");
-  } catch (err) {
+  } catch {
     locals.error = {
       message: "계정 생성에 실패하였습니다.",
     };
@@ -78,7 +73,7 @@ export const postSignup: RequestHandler = async (req, res) => {
   }
 };
 export const signout: RequestHandler = (req, res) => {
-  const { session } = req as AppRequest;
+  const { session } = req;
   delete session.loggedIn;
   delete session.user;
   return res.redirect("/");
@@ -94,10 +89,9 @@ export const ghSignin: RequestHandler = (req, res) => {
 };
 export const ghSigninAccess: RequestHandler = async (req, res) => {
   const {
+    session,
     query: { code },
-  } = req as AppRequest;
-  const { session } = req as AppRequest;
-
+  } = req;
   try {
     const baseUrl = "https://github.com/login/oauth/access_token";
     const params = new URLSearchParams({
@@ -123,11 +117,13 @@ export const ghSigninAccess: RequestHandler = async (req, res) => {
         Authorization: `${token_type} ${access_token}`,
       },
     }).then((data) => data.json());
-    const emails = await fetch(`${apiUrl}/user/emails`, {
+
+    const emails = (await fetch(`${apiUrl}/user/emails`, {
       headers: {
         Authorization: `${token_type} ${access_token}`,
       },
-    }).then<TGHEmails>((data) => data.json());
+    }).then((data) => data.json())) as TGHEmails;
+
     const { email } =
       emails.find(({ primary, verified }) => primary && verified) ?? {};
 
@@ -152,5 +148,53 @@ export const ghSigninAccess: RequestHandler = async (req, res) => {
     console.log(err);
   }
 };
+export const userProfile: RequestHandler = (req, res) => {
+  const { locals } = res;
+  locals.pageTitle = " Edit Profile";
+  return res.render("users/profile");
+};
+export const postUserProfile: RequestHandler = async (req, res) => {
+  const { locals } = res;
+  const {
+    session: {
+      user: {
+        _id,
+        email: _email,
+        username: _username,
+        avatarUrl: _avatarUrl,
+      } = {},
+    },
+    body: { name, email, username, location },
+    file,
+  } = req;
+  locals.pageTitle = " Edit Profile";
 
-export const profile: RequestHandler = (req, res) => {};
+  const isEmail = _email !== email && (await User.exists({ email }));
+  const isUsername =
+    _username !== username && (await User.exists({ username }));
+  if (isEmail || isUsername) {
+    locals.error = {
+      user: "이름이나 이메일 중 이미 존제합니다.",
+    };
+    return res.status(400).render("users/profile");
+  }
+
+  file && _avatarUrl && fs.rmSync(_avatarUrl);
+  const avatarUrl = file ? file.path : _avatarUrl;
+
+  const updateUser = await User.findByIdAndUpdate(
+    _id,
+    {
+      avatarUrl,
+      name,
+      email,
+      username,
+      location,
+    },
+    { new: true }
+  );
+
+  req.session.user = updateUser!;
+  return res.redirect(`profile`);
+};
+export const userSummary: RequestHandler = (req, res) => {};

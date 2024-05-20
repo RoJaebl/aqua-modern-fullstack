@@ -28,6 +28,8 @@ app.use(
 
 app.use(localsMiddleware);
 app.use("/public", proxy("http://localhost:3000"));
+app.use("/uploads", express.static("uploads"));
+
 app.use("/", rootRouter);
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);

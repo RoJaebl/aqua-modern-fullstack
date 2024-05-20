@@ -1,0 +1,19 @@
+.profile {
+  @apply flex flex-col items-center mb-[50px] mx-auto max-w-[420px];
+  > * {
+    @apply mb-[10px];
+  }
+  h3 {
+    @apply text-[18px];
+  }
+}
+
+.profile__password {
+  @apply mt-[50px] text-center;
+  a {
+    @apply underline;
+  }
+}
+.profile__avatar {
+  @apply w-[150px] h-[150px] rounded-[50%];
+}
