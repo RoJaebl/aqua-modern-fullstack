@@ -1,6 +1,7 @@
+import { Request } from "express";
 import { SessionData } from "express-session";
-import { IUserSchemaDefinition } from "../models/user.model";
-import { Types } from "mongoose";
+import { IUserDocument } from "../models/user.model";
+import { Document, Types } from "mongoose";
 
 type TVideoModel = {
   title: String;
@@ -18,12 +19,20 @@ declare global {
       videos?: TVideoModel[];
       formData?: Record<any, String>;
     }
+    export interface Request {
+      user?:
+        | (Document<unknown, {}, IUserDocument> &
+            IUserDocument & {
+              _id: Types.ObjectId;
+            })
+        | null;
+    }
   }
 }
 declare module "express-session" {
   export interface SessionData {
     loggedIn: Boolean;
-    user: IUserSchemaDefinition & {
+    user: IUserDocument & {
       _id: Types.ObjectId;
     };
   }

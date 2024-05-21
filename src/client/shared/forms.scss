@@ -8,7 +8,7 @@ form {
 
 input:not([type="range"]),
 .input_display {
-  @apply px-[20px] py-[15px]  bg-black mb-[5px] text-base text-white;
+  @apply px-[20px] py-[15px] bg-black mb-[5px] text-base text-white;
   @apply border border-solid border-white/20 rounded-[5px];
   @apply placeholder:text-white/70;
   &.disabled {
