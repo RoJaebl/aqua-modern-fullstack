@@ -74,7 +74,7 @@ export const postSignup: RequestHandler = async (req, res) => {
   }
 };
 export const signout: RequestHandler = (req, res) => {
-  req.session.destroy((err) => {});
+  req.session.destroy(() => {});
   return res.redirect("/");
 };
 export const ghSignin: RequestHandler = (req, res) => {
@@ -147,27 +147,20 @@ export const ghSigninAccess: RequestHandler = async (req, res) => {
     console.log(err);
   }
 };
-export const userProfile: RequestHandler = (req, res) => {
+export const profile: RequestHandler = (req, res) => {
   const { locals } = res;
-  locals.pageTitle = "Profile";
+  locals.pageTitle = "User Profile";
   return res.render("users/profile");
 };
-export const postUserProfile: RequestHandler = async (req, res) => {
+export const postProfile: RequestHandler = async (req, res, next) => {
   const { locals } = res;
   const {
-    params: { id: userId },
+    session: { user: { _id } = {} },
     body: { name, email, username, location },
     file,
   } = req;
-  locals.pageTitle = "Profile";
-
-  const user = await User.findById(userId);
-  if (!user) {
-    locals.error = {
-      user: "사용자를 찾을 수 없습니다.",
-    };
-    return res.status(404).render("404");
-  }
+  locals.pageTitle = "User Profile";
+  const user = req.user!;
 
   const isEmail = user.email !== email && (await User.exists({ email }));
   const isUsername =
@@ -178,10 +171,9 @@ export const postUserProfile: RequestHandler = async (req, res) => {
     };
     return res.status(400).render("users/profile");
   }
-
-  file && user.avatarUrl && fs.rmSync(user.avatarUrl);
-  const avatarUrl = file ? file.path : user.avatarUrl;
-
+  const isAvatar = fs.existsSync(user.avatarUrl!);
+  file && isAvatar && fs.rmSync(user.avatarUrl!);
+  const avatarUrl = file ? file.path : isAvatar ? user.avatarUrl : "";
   const updateUser = await User.findByIdAndUpdate(
     user.id,
     {
@@ -195,21 +187,39 @@ export const postUserProfile: RequestHandler = async (req, res) => {
   );
 
   req.session.user = updateUser!;
-  return res.redirect(`profile`);
+  return res.redirect("profile");
 };
-export const userSummary: RequestHandler = async (req, res) => {
+export const changePassword: RequestHandler = (req, res) => {
+  const { locals } = res;
+  locals.pageTitle = "Change Password";
+  return res.render("users/change-password");
+};
+export const postChangePassword: RequestHandler = async (req, res) => {
   const {
-    params: { id: userId },
+    body: { curPassword, password, password2 },
   } = req;
   const { locals } = res;
-  locals.pageTitle = "Summary";
-
-  if (!(await User.findById(userId))) {
+  locals.pageTitle = "Change Password";
+  const user = req.user!;
+  const isCompare = await bcrypt.compare(curPassword, user.password!);
+  if (!isCompare || password !== password2) {
     locals.error = {
-      user: "사용자를 찾을 수 없습니다.",
+      ...(!isCompare && { password: "기존 비밀번호가 맞지 않습니다." }),
+      ...(password !== password2 && {
+        password: "새로운 비밀번호가 서로 맞지 않습니다.",
+      }),
     };
-    return res.status(404).render("404");
+    return res.status(400).render("users/change-password");
   }
+
+  user.password = password;
+  user.save();
+  req.session.destroy(() => {});
+  return res.redirect("/signin");
+};
+export const summary: RequestHandler = async (req, res) => {
+  const { locals } = res;
+  locals.pageTitle = "User Summary";
 
   locals.videos = videos;
   return res.render("users/summary");

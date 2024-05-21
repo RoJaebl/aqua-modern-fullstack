@@ -7,6 +7,7 @@ import videoRouter from "./routers/video.router";
 import localsMiddleware from "./middlewares/locals.middleware";
 import proxy from "express-http-proxy";
 import MongoStore from "connect-mongo";
+import { notFoundMiddleware } from "./middlewares/route.middlware";
 
 const app = express();
 
@@ -25,13 +26,15 @@ app.use(
     }),
   })
 );
-
 app.use(localsMiddleware);
+
 app.use("/public", proxy("http://localhost:3000"));
 app.use("/uploads", express.static("uploads"));
 
 app.use("/", rootRouter);
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);
+
+app.use(notFoundMiddleware);
 
 export default app;

@@ -12,12 +12,12 @@ block content
     if user.socialOnly
       div.input_display.disabled=user.email
       div.input_display.disabled=user.username
+      div.input_display.disabled #{user && user.location ? user.location : "소속 국가"}
     else
       input(placeholder="이메일", name="email",type="email", required, value=user.email)
       input(placeholder="로그인 이름", name="username",type="text", required, value=user.username)
-    if !user.socialOnly
       input(placeholder="소속 국가", name="location",type="text", required, value=user.location)
-    input(type="submit", value="Update Profile")
+    input(type="submit", value="프로필 수정")
     if !user.socialOnly
       div.profile__password
-        a(href="change-password") Change Password &rarr;
+        a(href="change-password") 비밀번호 변경하기 &rarr;

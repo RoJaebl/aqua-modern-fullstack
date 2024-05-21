@@ -30,6 +30,10 @@ export const home: RequestHandler = (req, res) => {
 export const watch: RequestHandler = (req, res) => {};
 
 export const edit: RequestHandler = (req, res) => {
-  res.locals.pageTitle = "Edit";
+  res.locals.pageTitle = "Video Edit";
   return res.render("videos/edit");
+};
+export const upload: RequestHandler = (req, res) => {
+  res.locals.pageTitle = "Video Upload";
+  return res.render("videos/upload");
 };

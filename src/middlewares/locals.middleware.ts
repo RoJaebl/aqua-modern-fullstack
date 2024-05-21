@@ -11,8 +11,6 @@ const localsMiddleware: RequestHandler = (req, res, next) => {
     user,
   });
 
-  delete locals.formData;
-  delete locals.error;
   next();
 };
 
