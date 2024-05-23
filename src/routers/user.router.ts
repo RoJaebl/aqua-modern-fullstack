@@ -11,6 +11,7 @@ import { avatarUpload } from "../middlewares/multer.middleware";
 import {
   authorizeMiddleware,
   guardMiddleware,
+  paramUserMiddleware,
   socialOnlyMiddleware,
 } from "../middlewares/gaurd.middlware";
 
@@ -27,6 +28,6 @@ userRouter
   .all(authorizeMiddleware, socialOnlyMiddleware)
   .get(changePassword)
   .post(postChangePassword);
-userRouter.route("/:id").get(summary);
+userRouter.route("/:id").all(paramUserMiddleware).get(summary);
 
 export default userRouter;

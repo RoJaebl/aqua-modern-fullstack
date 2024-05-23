@@ -1,0 +1,6 @@
+.upload__video {
+  @apply flex flex-col items-center mb-[20px];
+  video {
+    @apply max-w-full mb-[10px];
+  }
+}

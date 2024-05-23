@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 
 export interface IUserDocument {
+  _id: mongoose.Schema.Types.ObjectId;
   email: string;
   avatarUrl?: string;
   socialOnly: boolean;
@@ -25,9 +26,7 @@ const userSchema = new mongoose.Schema<IUserDocument>({
   password: { type: String },
   name: { type: String, required: true },
   location: String,
-  videos: [
-    { type: mongoose.Schema.Types.ObjectId, require: true, ref: "User" },
-  ],
+  videos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Video" }],
 });
 
 userSchema.pre("save", async function () {
