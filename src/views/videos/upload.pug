@@ -1,0 +1,20 @@
+extends ../base
+
+block content
+  div.upload__video
+    video#preview
+    button#actionBtn.social__btn 녹화 시작
+  form(method="POST", enctype="multipart/form-data")
+    span.error-message #{error && error.message ? error.message : "" }
+    label(for="video") Video File
+    input(type="file", accept="video/*", required, id="video", name="video")
+    label(for="thumb") Thumbnail File
+    input(type="file", accept="image/*", required, id="thumb", name="thumb")
+    span.error-message #{error && error.title ? error.title : "" }
+    input(name="title", placeholder="제목", required, type="text", maxlength="80")
+    span.error-message #{error && error.description ? error.description : "" }
+    input(name="description", placeholder="설명", required, type="text",   minlength="20")
+    input(name="hashtags", placeholder="해쉬태그. 콤마(,)로 구분", required,   type="text")
+    input(type="submit", value="Upload Video")
+//- block scripts
+//-   script(src="/static/js/recorder.js")

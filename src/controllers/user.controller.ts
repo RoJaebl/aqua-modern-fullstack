@@ -4,7 +4,6 @@ import User from "../models/user.model";
 import bcrypt from "bcrypt";
 import { URLSearchParams } from "url";
 import fs from "fs";
-import { videos } from "./video.controller";
 
 export const signin: RequestHandler = (req, res) => {
   const { locals } = res;
@@ -20,7 +19,8 @@ export const postSignin: RequestHandler = async (req, res) => {
   locals.pageTitle = "Sign in";
 
   const user = await User.findOne({ username, socialOnly: false });
-  const isCompare = user && (await bcrypt.compare(password, user?.password!));
+  const isCompare =
+    user && (await bcrypt.compare(password, user.password ?? ""));
   if (!user || !isCompare) {
     locals.error = {
       ...(!user && { user: "사용자가 존제하지 않습니다." }),
@@ -155,27 +155,26 @@ export const profile: RequestHandler = (req, res) => {
 export const postProfile: RequestHandler = async (req, res, next) => {
   const { locals } = res;
   const {
-    session: { user: { _id } = {} },
     body: { name, email, username, location },
     file,
+    user,
   } = req;
   locals.pageTitle = "User Profile";
-  const user = req.user!;
 
-  const isEmail = user.email !== email && (await User.exists({ email }));
+  const isEmail = user!.email !== email && (await User.exists({ email }));
   const isUsername =
-    user.username !== username && (await User.exists({ username }));
+    user!.username !== username && (await User.exists({ username }));
   if (isEmail || isUsername) {
     locals.error = {
       user: "이름이나 이메일 중 이미 존제합니다.",
     };
     return res.status(400).render("users/profile");
   }
-  const isAvatar = fs.existsSync(user.avatarUrl!);
-  file && isAvatar && fs.rmSync(user.avatarUrl!);
-  const avatarUrl = file ? file.path : isAvatar ? user.avatarUrl : "";
+  const isAvatar = fs.existsSync(user!.avatarUrl ?? "");
+  file && isAvatar && fs.rmSync(user!.avatarUrl ?? "");
+  const avatarUrl = file ? file.path : isAvatar ? user!.avatarUrl : "";
   const updateUser = await User.findByIdAndUpdate(
-    user.id,
+    user!.id,
     {
       avatarUrl,
       name,
@@ -197,11 +196,11 @@ export const changePassword: RequestHandler = (req, res) => {
 export const postChangePassword: RequestHandler = async (req, res) => {
   const {
     body: { curPassword, password, password2 },
+    user,
   } = req;
   const { locals } = res;
   locals.pageTitle = "Change Password";
-  const user = req.user!;
-  const isCompare = await bcrypt.compare(curPassword, user.password!);
+  const isCompare = await bcrypt.compare(curPassword, user!.password!);
   if (!isCompare || password !== password2) {
     locals.error = {
       ...(!isCompare && { password: "기존 비밀번호가 맞지 않습니다." }),
@@ -212,15 +211,15 @@ export const postChangePassword: RequestHandler = async (req, res) => {
     return res.status(400).render("users/change-password");
   }
 
-  user.password = password;
-  user.save();
+  user!.password = password;
+  user!.save();
   req.session.destroy(() => {});
   return res.redirect("/signin");
 };
 export const summary: RequestHandler = async (req, res) => {
   const { locals } = res;
+  const { user } = req;
   locals.pageTitle = "User Summary";
-
-  locals.videos = videos;
+  locals.user = await user!.populate("videos");
   return res.render("users/summary");
 };

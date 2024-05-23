@@ -1,14 +1,7 @@
-import { Request } from "express";
 import { SessionData } from "express-session";
 import { IUserDocument } from "../models/user.model";
 import { Document, Types } from "mongoose";
-
-type TVideoModel = {
-  title: String;
-  id: Number;
-  description: String;
-  hashtags: String;
-};
+import { IVideoDocument } from "../models/video.model";
 
 declare global {
   namespace Express {
@@ -16,25 +9,20 @@ declare global {
       pageTitle?: String;
       siteName?: String;
       error?: Record<any, String>;
-      videos?: TVideoModel[];
+      videos?: IVideoDocument[];
       formData?: Record<any, String>;
     }
     export interface Request {
-      user?:
-        | (Document<unknown, {}, IUserDocument> &
-            IUserDocument & {
-              _id: Types.ObjectId;
-            })
-        | null;
+      user?: (Document<unknown, {}, IUserDocument> & IUserDocument) | null;
+      files?: Record<string, Multer.File[]>;
     }
   }
 }
+
 declare module "express-session" {
   export interface SessionData {
-    loggedIn: Boolean;
-    user: IUserDocument & {
-      _id: Types.ObjectId;
-    };
+    loggedIn?: Boolean;
+    user?: IUserDocument;
   }
 }
 
