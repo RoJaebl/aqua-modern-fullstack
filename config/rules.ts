@@ -14,7 +14,7 @@ export const styleRules = {
   ],
 };
 export const scriptRules = {
-  test: /\.[jt]s$/,
+  test: /\.[jt]sx?$/,
   use: {
     loader: "babel-loader",
     options: {

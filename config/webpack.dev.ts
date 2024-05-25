@@ -15,9 +15,4 @@ export default merge(commonConfig, {
     port: 3000,
     hot: true,
   },
-  optimization: {
-    splitChunks: {
-      chunks: "all",
-    },
-  },
 }) as WebpackConfiguration;
