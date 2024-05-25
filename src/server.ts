@@ -30,6 +30,7 @@ app.use(localsMiddleware);
 
 app.use("/public", proxy("http://localhost:3000"));
 app.use("/uploads", express.static("uploads"));
+app.use("/ffmpeg", express.static("node_modules/@ffmpeg"));
 
 app.use("/", rootRouter);
 app.use("/users", userRouter);
