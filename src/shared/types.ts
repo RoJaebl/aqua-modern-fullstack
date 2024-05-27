@@ -1,7 +1,7 @@
+import { IVideoDocument } from "./../models/video.model";
 import { SessionData } from "express-session";
 import { IUserDocument } from "../models/user.model";
 import { Document, Types } from "mongoose";
-import { IVideoDocument } from "../models/video.model";
 
 declare global {
   namespace Express {
@@ -9,11 +9,12 @@ declare global {
       pageTitle?: String;
       siteName?: String;
       error?: Record<any, String>;
-      videos?: IVideoDocument[];
+      videos?: IVideoDocument | Array<IVideoDocument>;
       formData?: Record<any, String>;
     }
     export interface Request {
       user?: (Document<unknown, {}, IUserDocument> & IUserDocument) | null;
+      video?: (Document<unknown, {}, IVideoDocument> & IVideoDocument) | null;
       files?: Record<string, Multer.File[]>;
     }
   }
