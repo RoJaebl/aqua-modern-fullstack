@@ -7,7 +7,7 @@ export const home: RequestHandler = async (req, res) => {
   locals.videos = await Video.find({})
     .sort({ createdAt: "desc" })
     .populate("owner");
-  console.log(locals.videos);
+  console.log(locals.user?.videos, locals.videos);
   return res.render("videos/home");
 };
 export const edit: RequestHandler = (req, res) => {
@@ -60,4 +60,10 @@ export const postUpload: RequestHandler = async (req, res) => {
     return res.status(400).render("videos/upload");
   }
 };
-export const watch: RequestHandler = (req, res) => {};
+export const watch: RequestHandler = async (req, res) => {
+  const { locals } = res;
+  const { video } = req;
+  locals.video = await video!.populate("owner");
+  locals.pageTitle = locals.video?.title;
+  return res.render("videos/watch");
+};

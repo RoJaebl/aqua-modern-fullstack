@@ -220,6 +220,12 @@ export const summary: RequestHandler = async (req, res) => {
   const { locals } = res;
   const { user } = req;
   locals.pageTitle = "User Summary";
-  locals.user = await user!.populate("videos");
+  locals.user = await user!.populate({
+    path: "videos",
+    populate: {
+      path: "owner",
+      model: "User",
+    },
+  });
   return res.render("users/summary");
 };

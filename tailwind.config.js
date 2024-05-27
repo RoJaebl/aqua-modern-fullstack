@@ -7,6 +7,12 @@ module.exports = {
         "primary-color": "var(--primary-color)",
         "primary-bg": "var(--primary-bg)",
       },
+      transitionProperty: {
+        opacity: "opacity",
+      },
+      translate: {
+        center: "-50%",
+      },
     },
   },
   plugins: [],

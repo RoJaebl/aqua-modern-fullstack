@@ -2,8 +2,6 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import $ from "jquery";
 
-const actionBtn = $("#actionBtn");
-const video = $("#preview");
 let videoUrl: string;
 let stream: MediaStream;
 
@@ -14,7 +12,7 @@ const files = {
 };
 
 const handleDownload = async () => {
-  actionBtn.prop({ disabled: true, innerText: "변환 중" }).off("click");
+  $("#actionBtn").prop({ disabled: true, innerText: "변환 중" }).off("click");
 
   const baseUrl = "http://localhost:4000/ffmpeg/core/dist/umd";
   const ffmpeg = new FFmpeg();
@@ -49,27 +47,27 @@ const handleDownload = async () => {
   download(files.mp4, "video/mp4", "MyRecording.mp4");
   download(files.jpg, "image/jpg", "MyThumbnail.jpg");
 
-  actionBtn
+  $("#actionBtn")
     .prop({ disabled: false, innerText: "녹화 재시작" })
-    .on("click", handleStart);
-  video.prop({ srcObject: stream }).trigger("play");
+    .on({ click: handleStart });
+  $("#preview").prop({ srcObject: stream }).trigger("play");
 };
 
 const handleStart = function () {
-  actionBtn.prop({ disabled: true, innerText: "녹화 중" }).off("click");
-  const recorder = new MediaRecorder(video.prop("srcObject"));
+  $("#actionBtn").prop({ disabled: true, innerText: "녹화 중" }).off("click");
+  const recorder = new MediaRecorder($("#preview").prop("srcObject"));
   recorder.ondataavailable = (e) => {
     videoUrl = URL.createObjectURL(e.data);
-    video
+    $("#preview")
       .prop({
         srcObject: null,
         src: videoUrl,
         loop: true,
       })
       .trigger("play");
-    actionBtn
+    $("#actionBtn")
       .prop({ disabled: false, innerText: "녹화본 다운로드" })
-      .on("click", handleDownload);
+      .on({ click: handleDownload });
   };
   recorder.start();
   setTimeout(() => {
@@ -82,6 +80,6 @@ $(async function () {
     audio: false,
     video: { width: 1024, height: 576 },
   });
-  video.prop({ srcObject: stream }).trigger("play");
+  $("#preview").prop({ srcObject: stream }).trigger("play");
+  $("#actionBtn").on({ click: handleStart });
 });
-actionBtn.on("click", handleStart);
