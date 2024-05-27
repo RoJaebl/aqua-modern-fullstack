@@ -1,6 +1,6 @@
 import mongoose, { Document, HydratedDocument, Model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 
 export interface IUserDocument {
   _id: mongoose.Schema.Types.ObjectId;
@@ -13,10 +13,6 @@ export interface IUserDocument {
   location?: string;
   videos: mongoose.Schema.Types.ObjectId[];
 }
-
-// export interface IUserModel extends Model<IUserDocument> {
-//   protector(req: Request, res: Response): HydratedDocument<IUserDocument>;
-// }
 
 const userSchema = new mongoose.Schema<IUserDocument>({
   email: { type: String, required: true, unique: true },
@@ -34,26 +30,6 @@ userSchema.pre("save", async function () {
     this.password = await bcrypt.hash(this.password ?? "", 5);
   }
 });
-
-// userSchema.static("protector", async function (req: Request, res: Response) {
-//   const {
-//     session: { user: { _id } = {} },
-//   } = req;
-//   const { locals } = res;
-//   let user;
-//   try {
-//     user = await User.findById("664c56d106e966ab275ef9b8");
-//   } catch (err) {
-//     console.log(err);
-//   }
-//   if (!user) {
-//     locals.error = {
-//       page: "사용자가 존제하지 않습니다.",
-//     };
-//     return res.status(404).redirect("/");
-//   }
-//   return user;
-// });
 
 const User = mongoose.model<IUserDocument>("User", userSchema);
 export default User;

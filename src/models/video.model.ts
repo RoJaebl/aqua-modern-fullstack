@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 
 export interface IVideoDocument {
   _id: mongoose.Schema.Types.ObjectId;
@@ -15,7 +15,11 @@ export interface IVideoDocument {
   owner: mongoose.Schema.Types.ObjectId;
 }
 
-const videoSchema = new mongoose.Schema<IVideoDocument>({
+export interface IVideoModel extends Model<IVideoDocument> {
+  formatHashtags(tags: string): string;
+}
+
+const videoSchema = new mongoose.Schema<IVideoDocument, IVideoModel>({
   title: { type: String, required: true, trim: true, maxLength: 80 },
   fileUrl: { type: String, required: true },
   thumbUrl: { type: String, required: true },
@@ -29,5 +33,13 @@ const videoSchema = new mongoose.Schema<IVideoDocument>({
   owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
 });
 
-const Video = mongoose.model<IVideoDocument>("Video", videoSchema);
+videoSchema.static("formatHashtags", (tags: string) => {
+  return tags
+    .split(/(?:, +)|(?:,)/)
+    .map((word) =>
+      word.startsWith("#") ? word.replace(/^(#+)/, "#") : `#${word}`
+    );
+});
+
+const Video = mongoose.model<IVideoDocument, IVideoModel>("Video", videoSchema);
 export default Video;

@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import Video from "../models/video.model";
 
-export const home: RequestHandler = async (req, res) => {
+export const home: RequestHandler = async (_, res) => {
   const { locals } = res;
   locals.pageTitle = "Home";
   locals.videos = await Video.find({})
@@ -10,12 +10,7 @@ export const home: RequestHandler = async (req, res) => {
   console.log(locals.user?.videos, locals.videos);
   return res.render("videos/home");
 };
-export const edit: RequestHandler = (req, res) => {
-  const { locals } = res;
-  locals.pageTitle = "Video Edit";
-  return res.render("videos/edit");
-};
-export const upload: RequestHandler = (req, res) => {
+export const upload: RequestHandler = (_, res) => {
   const { locals } = res;
   locals.pageTitle = "Video Upload";
   return res.render("videos/upload");
@@ -30,15 +25,6 @@ export const postUpload: RequestHandler = async (req, res) => {
   locals.pageTitle = "Video Upload";
   const fileUrl = video[0].path;
   const thumbUrl = thumb[0].path;
-  if (80 < title.length || description.length < 20) {
-    locals.error = {
-      ...(80 < title.length && { title: "제목을 80자 이하로 작성하세요." }),
-      ...(description.length < 20 && {
-        description: "설명을 20자 초과하여 작성하세요.",
-      }),
-    };
-    return res.status(400).render("videos/upload");
-  }
 
   try {
     const newVidoe = await Video.create({
@@ -46,7 +32,7 @@ export const postUpload: RequestHandler = async (req, res) => {
       fileUrl,
       description,
       thumbUrl,
-      hashtags,
+      hashtags: Video.formatHashtags(hashtags),
       owner: user!.id,
     });
     user!.videos.push(newVidoe.id);
@@ -63,7 +49,25 @@ export const postUpload: RequestHandler = async (req, res) => {
 export const watch: RequestHandler = async (req, res) => {
   const { locals } = res;
   const { video } = req;
+  video?.owner;
   locals.video = await video!.populate("owner");
   locals.pageTitle = locals.video?.title;
   return res.render("videos/watch");
+};
+export const edit: RequestHandler = (_, res) => {
+  const { locals } = res;
+  locals.pageTitle = "Video Edit";
+  return res.render("videos/edit");
+};
+export const postEdit: RequestHandler = async (req, res) => {
+  const {
+    video,
+    body: { title, description, hashtags },
+  } = req;
+  await Video.findByIdAndUpdate(video!.id, {
+    title,
+    description,
+    hashtags: Video.formatHashtags(hashtags),
+  });
+  return res.redirect(`/videos/${video!.id}`);
 };

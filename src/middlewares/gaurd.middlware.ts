@@ -68,3 +68,35 @@ export const socialOnlyMiddleware: RequestHandler = (req, res, next) => {
   }
   next();
 };
+
+export const videoAuthorizeMiddleware: RequestHandler = (req, res, next) => {
+  const {
+    video,
+    session: { user },
+  } = req;
+
+  if (String(video?.owner) !== String(user?._id)) {
+    return res.status(403).redirect("/");
+  }
+  next();
+};
+
+export const videoValidateMiddleware = (view: string) => {
+  const handler: RequestHandler = (req, res, next) => {
+    const { locals } = res;
+    const {
+      body: { title, description },
+    } = req;
+    if (80 < title.length || description.length < 20) {
+      locals.error = {
+        ...(80 < title.length && { title: "제목을 80자 이하로 작성하세요." }),
+        ...(description.length < 20 && {
+          description: "설명을 20자 초과하여 작성하세요.",
+        }),
+      };
+      return res.status(400).render(view);
+    }
+    next();
+  };
+  return handler;
+};
