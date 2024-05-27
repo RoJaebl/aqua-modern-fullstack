@@ -26,7 +26,7 @@ block content
     small.video__owner Uploaded by 
       a(href=`/users/${video.owner.id}`) #{video.owner.name} 
     small.video__createdAt=new Date(video.createdAt).toLocaleDateString("ko-KR")
-  if String(video.owner.id) === String(user.id)
+  if String(video.owner.id) === String(user._id)
     a(href=`${video.id}/edit`) Edit Video &rarr;
     br
     a(href=`${video.id}/delete`) Delete Video &rarr;

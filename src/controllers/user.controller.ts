@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import { URLSearchParams } from "url";
 import fs from "fs";
 
-export const signin: RequestHandler = (req, res) => {
+export const signin: RequestHandler = (_, res) => {
   const { locals } = res;
   locals.pageTitle = "Sign in";
   return res.render("users/signin");
@@ -33,7 +33,7 @@ export const postSignin: RequestHandler = async (req, res) => {
   session.user = user;
   return res.redirect("/");
 };
-export const signup: RequestHandler = (req, res) => {
+export const signup: RequestHandler = (_, res) => {
   const { locals } = res;
   locals.pageTitle = "Sign up";
   return res.render("users/signup");
@@ -77,7 +77,7 @@ export const signout: RequestHandler = (req, res) => {
   req.session.destroy(() => {});
   return res.redirect("/");
 };
-export const ghSignin: RequestHandler = (req, res) => {
+export const ghSignin: RequestHandler = (_, res) => {
   const baseUrl = "https://github.com/login/oauth/authorize";
   const params = new URLSearchParams({
     client_id: process.env.GH_OAUTH_ID!,
@@ -147,12 +147,12 @@ export const ghSigninAccess: RequestHandler = async (req, res) => {
     console.log(err);
   }
 };
-export const profile: RequestHandler = (req, res) => {
+export const profile: RequestHandler = (_, res) => {
   const { locals } = res;
   locals.pageTitle = "User Profile";
   return res.render("users/profile");
 };
-export const postProfile: RequestHandler = async (req, res, next) => {
+export const postProfile: RequestHandler = async (req, res) => {
   const { locals } = res;
   const {
     body: { name, email, username, location },
@@ -188,7 +188,7 @@ export const postProfile: RequestHandler = async (req, res, next) => {
   req.session.user = updateUser!;
   return res.redirect("profile");
 };
-export const changePassword: RequestHandler = (req, res) => {
+export const changePassword: RequestHandler = (_, res) => {
   const { locals } = res;
   locals.pageTitle = "Change Password";
   return res.render("users/change-password");
