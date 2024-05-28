@@ -1,5 +1,5 @@
 import express from "express";
-import { home } from "../controllers/video.controller";
+import { home, search } from "../controllers/video.controller";
 import {
   ghSignin,
   ghSigninAccess,
@@ -28,4 +28,5 @@ rootRouter
   .route("/signin/oauth/github/access")
   .all(restrictMiddleware)
   .get(ghSigninAccess);
+rootRouter.get("/search", search);
 export default rootRouter;

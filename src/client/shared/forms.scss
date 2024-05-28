@@ -1,6 +1,10 @@
 form {
   @apply flex flex-col max-w-[420px] my-0 mx-auto items-stretch justify-center;
   @apply p-[30px] bg-primary-bg rounded-[10px] border border-solid border-white/10;
+  &:not(.search__form) {
+    @apply p-[30px] bg-primary-bg rounded-[10px] border border-solid
+      border-white/10;
+  }
   label {
     @apply block text-[14px] mb-[10px];
   }
