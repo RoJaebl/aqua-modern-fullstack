@@ -1,0 +1,12 @@
+.search__form {
+  @apply relative flex items-center mb-[60px] border-0 p-0;
+  input {
+    @apply py-[12px] px-[20px] rounded-[5px] border border-solid
+      border-white/20 w-[420px] #{!important};
+    @apply bg-black mb-[5px] text-[16px] text-white w-[90%];
+  }
+  button {
+    all: unset;
+    @apply absolute right-[15px] text-[18px] bg-black/0 text-center cursor-pointer;
+  }
+}

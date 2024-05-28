@@ -69,11 +69,25 @@ export const postEdit: RequestHandler = async (req, res) => {
   });
   return res.redirect(`/videos/${video!.id}`);
 };
-
 export const remove: RequestHandler = async (req, res) => {
   const { _id, videos } = req.video.owner;
   videos.splice(videos.indexOf(_id), 1);
   await User.findByIdAndUpdate(_id, { videos });
   await Video.findByIdAndDelete(req.video?._id);
   return res.redirect("/");
+};
+export const search: RequestHandler = async (req, res) => {
+  const { keyword } = req.query;
+  const { locals } = res;
+  locals.pageTitle = "Video Search";
+  locals.videos = [];
+  keyword &&
+    locals.videos.push(
+      ...(await Video.find({
+        title: {
+          $regex: new RegExp(`${keyword}`, "i"),
+        },
+      }).populate("owner"))
+    );
+  return res.render("search");
 };
