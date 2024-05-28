@@ -1,9 +1,7 @@
-import mongoose, { Document, HydratedDocument, Model, Schema } from "mongoose";
+import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { Request, RequestHandler, Response } from "express";
 
 export interface IUserDocument {
-  _id: mongoose.Schema.Types.ObjectId;
   email: string;
   avatarUrl?: string;
   socialOnly: boolean;
@@ -13,7 +11,6 @@ export interface IUserDocument {
   location?: string;
   videos: mongoose.Schema.Types.ObjectId[];
 }
-
 const userSchema = new mongoose.Schema<IUserDocument>({
   email: { type: String, required: true, unique: true },
   avatarUrl: String,

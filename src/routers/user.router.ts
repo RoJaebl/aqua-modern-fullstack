@@ -28,6 +28,17 @@ userRouter
   .all(authorizeMiddleware, socialOnlyMiddleware)
   .get(changePassword)
   .post(postChangePassword);
-userRouter.route("/:id").all(paramMiddleware("user")).get(summary);
+userRouter
+  .route("/:id([0-9a-z]{24})")
+  .all(
+    paramMiddleware("user", {
+      path: "videos",
+      populate: {
+        path: "owner",
+        model: "User",
+      },
+    })
+  )
+  .get(summary);
 
 export default userRouter;

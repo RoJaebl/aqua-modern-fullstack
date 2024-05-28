@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import Video from "../models/video.model";
+import User from "../models/user.model";
 
 export const home: RequestHandler = async (_, res) => {
   const { locals } = res;
@@ -7,7 +8,6 @@ export const home: RequestHandler = async (_, res) => {
   locals.videos = await Video.find({})
     .sort({ createdAt: "desc" })
     .populate("owner");
-  console.log(locals.user?.videos, locals.videos);
   return res.render("videos/home");
 };
 export const upload: RequestHandler = (_, res) => {
@@ -19,9 +19,9 @@ export const postUpload: RequestHandler = async (req, res) => {
   const { locals } = res;
   const {
     body: { title, description, hashtags },
-    files: { video, thumb } = {},
     user,
   } = req;
+  const { video, thumb } = req.files!;
   locals.pageTitle = "Video Upload";
   const fileUrl = video[0].path;
   const thumbUrl = thumb[0].path;
@@ -48,10 +48,8 @@ export const postUpload: RequestHandler = async (req, res) => {
 };
 export const watch: RequestHandler = async (req, res) => {
   const { locals } = res;
-  const { video } = req;
-  video?.owner;
-  locals.video = await video!.populate("owner");
-  locals.pageTitle = locals.video?.title;
+  locals.video = req.video;
+  locals.pageTitle = locals.video.title;
   return res.render("videos/watch");
 };
 export const edit: RequestHandler = (_, res) => {
@@ -70,4 +68,12 @@ export const postEdit: RequestHandler = async (req, res) => {
     hashtags: Video.formatHashtags(hashtags),
   });
   return res.redirect(`/videos/${video!.id}`);
+};
+
+export const remove: RequestHandler = async (req, res) => {
+  const { _id, videos } = req.video.owner;
+  videos.splice(videos.indexOf(_id), 1);
+  await User.findByIdAndUpdate(_id, { videos });
+  await Video.findByIdAndDelete(req.video?._id);
+  return res.redirect("/");
 };
