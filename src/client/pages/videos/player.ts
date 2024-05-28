@@ -57,6 +57,16 @@ const playState = new Displayer($("#videoPlayState"), {
   time: 500,
 });
 
+$("video").on({
+  loadedmetadata: function () {
+    const time = Math.floor($("video").prop("duration"));
+    $("#totalTime").prop({
+      innerText: formatTime(time),
+    });
+    $("#timeline").prop({ max: time });
+  },
+});
+
 $(function () {
   $("video").prop({ volume: 0.5 });
 
@@ -91,12 +101,9 @@ $(function () {
       $("#currentTime").prop({ innerText: formatTime(curTime) });
       $("#timeline").prop({ value: curTime });
     },
-    loadedmetadata: () => {
-      const time = Math.floor($("video").prop("duration"));
-      $("#totalTime").prop({
-        innerText: formatTime(time),
-      });
-      $("#timeline").prop({ max: time });
+    ended: () => {
+      const { id } = $("#videoContainer").prop("dataset");
+      fetch(`/api/videos/${id}/views`, { method: "POST" });
     },
   });
 

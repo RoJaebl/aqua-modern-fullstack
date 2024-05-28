@@ -8,6 +8,7 @@ import localsMiddleware from "./middlewares/locals.middleware";
 import proxy from "express-http-proxy";
 import MongoStore from "connect-mongo";
 import { notFoundMiddleware } from "./middlewares/route.middlware";
+import apiRouter from "./routers/api.router";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use("/ffmpeg", express.static("node_modules/@ffmpeg"));
 app.use("/", rootRouter);
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);
+app.use("/api", apiRouter);
 
 app.use(notFoundMiddleware);
 
