@@ -91,3 +91,8 @@ export const search: RequestHandler = async (req, res) => {
     );
   return res.render("search");
 };
+export const registerView: RequestHandler = async (req, res) => {
+  req.video.meta.views += 1;
+  await req.video.save();
+  return res.sendStatus(200);
+};
