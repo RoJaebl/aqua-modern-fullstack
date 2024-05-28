@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
-import { TGHEmails } from "../shared/types";
-import User from "../models/user.model";
+import { TDocument, TGHEmails } from "../shared/types";
+import User, { IUserDocument } from "../models/user.model";
 import bcrypt from "bcrypt";
 import { URLSearchParams } from "url";
 import fs from "fs";
@@ -18,7 +18,10 @@ export const postSignin: RequestHandler = async (req, res) => {
   } = req;
   locals.pageTitle = "Sign in";
 
-  const user = await User.findOne({ username, socialOnly: false });
+  const user = (await User.findOne({
+    username,
+    socialOnly: false,
+  })) as TDocument<IUserDocument>;
   const isCompare =
     user && (await bcrypt.compare(password, user.password ?? ""));
   if (!user || !isCompare) {
@@ -141,7 +144,7 @@ export const ghSigninAccess: RequestHandler = async (req, res) => {
       });
 
     session.loggedIn = true;
-    session.user = user;
+    session.user = user as TDocument<IUserDocument>;
     return res.redirect("/");
   } catch (err) {
     console.log(err);
@@ -170,10 +173,10 @@ export const postProfile: RequestHandler = async (req, res) => {
     };
     return res.status(400).render("users/profile");
   }
-  const isAvatar = fs.existsSync(user!.avatarUrl ?? "");
+  const isAvatar = fs.existsSync(user!.avatarUrl ?? "") || user!.socialOnly;
   file && isAvatar && fs.rmSync(user!.avatarUrl ?? "");
   const avatarUrl = file ? file.path : isAvatar ? user!.avatarUrl : "";
-  const updateUser = await User.findByIdAndUpdate(
+  const updateUser = (await User.findByIdAndUpdate(
     user!.id,
     {
       avatarUrl,
@@ -183,8 +186,7 @@ export const postProfile: RequestHandler = async (req, res) => {
       location,
     },
     { new: true }
-  );
-
+  )) as TDocument<IUserDocument>;
   req.session.user = updateUser!;
   return res.redirect("profile");
 };
@@ -218,14 +220,7 @@ export const postChangePassword: RequestHandler = async (req, res) => {
 };
 export const summary: RequestHandler = async (req, res) => {
   const { locals } = res;
-  const { user } = req;
   locals.pageTitle = "User Summary";
-  locals.user = await user!.populate({
-    path: "videos",
-    populate: {
-      path: "owner",
-      model: "User",
-    },
-  });
+  locals.user = req.user!;
   return res.render("users/summary");
 };

@@ -3,6 +3,7 @@ import {
   edit,
   postEdit,
   postUpload,
+  remove,
   upload,
   watch,
 } from "../controllers/video.controller";
@@ -27,12 +28,16 @@ videoRouter
   );
 videoRouter
   .route("/:id([0-9a-f]{24})")
-  .all(paramMiddleware("video"))
+  .all(paramMiddleware("video", "owner"))
   .get(watch);
 videoRouter
   .route("/:id([0-9a-f]{24})/edit")
   .all(paramMiddleware("video"), videoAuthorizeMiddleware)
   .get(edit)
   .post(videoValidateMiddleware("videos/edit"), postEdit);
+videoRouter
+  .route("/:id([0-9a-f]{24})/delete")
+  .all(paramMiddleware("video", "owner"), videoAuthorizeMiddleware)
+  .get(remove);
 
 export default videoRouter;
