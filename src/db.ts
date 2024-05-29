@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 mongoose.connect(process.env.DB_URL!);
 import "./models/user.model";
 import "./models/video.model";
+import "./models/comment.model";
 
 const db = mongoose.connection;
 

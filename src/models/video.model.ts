@@ -1,6 +1,10 @@
-import mongoose, { Model } from "mongoose";
+import mongoose, { Model, Schema, Types } from "mongoose";
+import { TDocument } from "../shared/types";
+import { ICommentDocument } from "./comment.model";
+import { IUserDocument } from "./user.model";
 
 export interface IVideoDocument {
+  _id: Schema.Types.ObjectId;
   title: string;
   fileUrl: string;
   thumbUrl: string;
@@ -11,14 +15,15 @@ export interface IVideoDocument {
     views: number;
     rating: number;
   };
-  owner: mongoose.Schema.Types.ObjectId;
+  comments: (Schema.Types.ObjectId | TDocument<ICommentDocument>)[];
+  owner: Schema.Types.ObjectId | TDocument<IUserDocument>;
 }
 
 export interface IVideoModel extends Model<IVideoDocument> {
   formatHashtags(tags: string): string;
 }
 
-const videoSchema = new mongoose.Schema<IVideoDocument, IVideoModel>({
+const videoSchema = new Schema<IVideoDocument, IVideoModel>({
   title: { type: String, required: true, trim: true, maxLength: 80 },
   fileUrl: { type: String, required: true },
   thumbUrl: { type: String, required: true },
@@ -29,8 +34,9 @@ const videoSchema = new mongoose.Schema<IVideoDocument, IVideoModel>({
     views: { type: Number, default: 0, required: true },
     rating: { type: Number, default: 0, required: true },
   },
+  comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   owner: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: "User",
   },

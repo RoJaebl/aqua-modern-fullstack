@@ -32,18 +32,18 @@ block content
     a(href=`${video.id}/delete`) Delete Video &rarr;
   if loggedIn
     div.video__add-comments
-      form.video__commetns-form#commentForm
-        textarea(cols="30", rows="10", placeholder="Write a nice comment...")
+      form#commentForm.video__commetns-form
+        textarea(cols="30", rows="10", placeholder="댓글 달기...")
         button Add Comment
-  //- div.video__comments#comments
-  //-   ul 
-  //-     each comment in video.comments.reverse()
-  //-       li.video__comment(data-id=comment.id)
-  //-         i.fas.fa-comment
-  //-         span #{comment.text}
-  //-         if String(user.id) === String(comment.owner)
-  //-           i.fas.fa-x
+  div#comments.video__comments
+    ul 
+      each comment in video.comments.reverse()
+        li.video__comment(data-id=comment.id)
+          i.fas.fa-comment
+          span #{comment.text}
+          if String(user._id) === String(comment.owner)
+            i.fas.fa-x
 block scripts 
   script(src="/public/pages/videos/player.js")
-  //- if loggedIn
-  //-   script(src="/static/js/commentSection.js")
+  if loggedIn
+    script(src="/public/pages/videos/comment.js")

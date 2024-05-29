@@ -1,16 +1,13 @@
 import { IVideoDocument } from "./../models/video.model";
 import { SessionData } from "express-session";
 import { IUserDocument } from "../models/user.model";
-import { Document, Model, ObjectId, PopulateOptions, Types } from "mongoose";
+import { Document, PopulateOptions, Schema, Types } from "mongoose";
 import { Response as Res } from "express";
+import { ICommentDocument } from "../models/comment.model";
 
 export type TDocument<T> =
-  | (T &
-      Document<unknown, {}, T> & {
-        _id: Types.ObjectId;
-      } & Omit<Document<unknown, {}, T>, never> & { _id: ObjectId })
-  | null
-  | undefined;
+  | T & Document<unknown, {}, T> & Omit<Document<unknown, {}, T>, never>;
+
 export type TPopulatePath =
   | string
   | PopulateOptions
@@ -24,15 +21,15 @@ declare global {
       siteName?: String;
       error?: Record<any, String>;
       videos?: IVideoDocument[];
-      video?: IVideoDocument;
+      video?: IVideoDocument & {
+        comments: (ICommentDocument | Schema.Types.ObjectId | Types.ObjectId)[];
+      };
       formData?: Record<any, String>;
     }
     export interface Request {
       user: TDocument<IUserDocument>;
-      video:
-        | TDocument<IVideoDocument> & {
-            owner: TDocument<IUserDocument>;
-          };
+      video: TDocument<IVideoDocument>;
+      comment: TDocument<ICommentDocument>;
       file?: Record<string, Multer.File>;
       files?: Record<string, Multer.File[]>;
     }

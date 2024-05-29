@@ -25,7 +25,7 @@ userRouter
   .post(avatarUpload.single("avatar"), postProfile);
 userRouter
   .route("/change-password")
-  .all(authorizeMiddleware, socialOnlyMiddleware)
+  .all(authorizeMiddleware, socialOnlyMiddleware, guardMiddleware)
   .get(changePassword)
   .post(postChangePassword);
 userRouter
