@@ -1,7 +1,11 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
+import { TDocument } from "../shared/types";
+import { ICommentDocument } from "./comment.model";
+import { IVideoDocument } from "./video.model";
 
 export interface IUserDocument {
+  _id: Schema.Types.ObjectId;
   email: string;
   avatarUrl?: string;
   socialOnly: boolean;
@@ -9,9 +13,10 @@ export interface IUserDocument {
   password?: string;
   name: string;
   location?: string;
-  videos: mongoose.Schema.Types.ObjectId[];
+  comments: (Schema.Types.ObjectId | TDocument<ICommentDocument>)[];
+  videos: (Schema.Types.ObjectId | TDocument<IVideoDocument>)[];
 }
-const userSchema = new mongoose.Schema<IUserDocument>({
+const userSchema = new Schema<IUserDocument>({
   email: { type: String, required: true, unique: true },
   avatarUrl: String,
   socialOnly: { type: Boolean, default: false },
@@ -19,7 +24,8 @@ const userSchema = new mongoose.Schema<IUserDocument>({
   password: { type: String },
   name: { type: String, required: true },
   location: String,
-  videos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Video" }],
+  comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+  videos: [{ type: Schema.Types.ObjectId, ref: "Video" }],
 });
 
 userSchema.pre("save", async function () {

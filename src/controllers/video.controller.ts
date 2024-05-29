@@ -1,6 +1,9 @@
 import { RequestHandler } from "express";
 import Video from "../models/video.model";
-import User from "../models/user.model";
+import User, { IUserDocument } from "../models/user.model";
+import fs from "fs";
+import Comment from "../models/comment.model";
+import { TDocument } from "../shared/types";
 
 export const home: RequestHandler = async (_, res) => {
   const { locals } = res;
@@ -33,11 +36,11 @@ export const postUpload: RequestHandler = async (req, res) => {
       description,
       thumbUrl,
       hashtags: Video.formatHashtags(hashtags),
-      owner: user!.id,
+      owner: user.id,
+      comments: [],
     });
-    user!.videos.push(newVidoe.id);
-    user!.save();
-
+    user.videos.push(newVidoe.id);
+    user.save();
     return res.redirect("/");
   } catch {
     locals.error = {
@@ -49,7 +52,7 @@ export const postUpload: RequestHandler = async (req, res) => {
 export const watch: RequestHandler = async (req, res) => {
   const { locals } = res;
   locals.video = req.video;
-  locals.pageTitle = locals.video.title;
+  locals.pageTitle = locals.video?.title;
   return res.render("videos/watch");
 };
 export const edit: RequestHandler = (_, res) => {
@@ -70,10 +73,15 @@ export const postEdit: RequestHandler = async (req, res) => {
   return res.redirect(`/videos/${video!.id}`);
 };
 export const remove: RequestHandler = async (req, res) => {
-  const { _id, videos } = req.video.owner;
-  videos.splice(videos.indexOf(_id), 1);
-  await User.findByIdAndUpdate(_id, { videos });
-  await Video.findByIdAndDelete(req.video?._id);
+  const { _id: videoId, owner, fileUrl, thumbUrl } = req.video;
+  const { _id: userId, videos } = owner as TDocument<IUserDocument>;
+
+  fileUrl && fs.rmSync(fileUrl);
+  thumbUrl && fs.rmSync(thumbUrl);
+
+  videos.splice(videos.indexOf(videoId), 1);
+  await Video.findByIdAndDelete(videoId);
+  await User.findByIdAndUpdate(userId, { videos });
   return res.redirect("/");
 };
 export const search: RequestHandler = async (req, res) => {
@@ -91,8 +99,35 @@ export const search: RequestHandler = async (req, res) => {
     );
   return res.render("search");
 };
-export const registerView: RequestHandler = async (req, res) => {
+export const postView: RequestHandler = async (req, res) => {
   req.video.meta.views += 1;
   await req.video.save();
   return res.sendStatus(200);
+};
+export const postComment: RequestHandler = async (req, res) => {
+  const { user, video, body } = req;
+  const { _id: videoId, comments: videoComments } = video;
+  const { _id: userId, comments: userComments } = user;
+
+  const newComment = await Comment.create({
+    text: body.text,
+    owner: userId,
+    video: videoId,
+  });
+
+  videoComments.push(newComment.id);
+  await video.save();
+  userComments.push(newComment.id);
+  await user.save();
+  return res.status(201).json({ id: newComment.id });
+};
+export const removeComment: RequestHandler = async (req, res) => {
+  const { user, video, comment } = req;
+
+  video.comments.splice(video.comments.indexOf(comment._id), 1);
+  await video.save();
+  user.comments.splice(user.comments.indexOf(comment._id), 1);
+  await user.save();
+  await Comment.findByIdAndDelete(comment._id);
+  return res.sendStatus(201);
 };

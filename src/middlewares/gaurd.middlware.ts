@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
 import User, { IUserDocument } from "../models/user.model";
-import Video, { IVideoDocument } from "../models/video.model";
+import Video from "../models/video.model";
 import { Response, TPopulatePath, TDocument } from "../shared/types";
 import { Model, Types } from "mongoose";
+import Comment from "../models/comment.model";
 
 export const authorizeMiddleware: RequestHandler = (req, res, next) =>
   !req.session.user ? res.redirect("/signin") : next();
@@ -70,11 +71,25 @@ export const paramMiddleware = (
 export const socialOnlyMiddleware: RequestHandler = (req, res, next) =>
   req.session.user?.socialOnly ? res.redirect("/") : next();
 
-export const videoAuthorizeMiddleware: RequestHandler = (req, res, next) =>
-  String(req.video?.owner?._id ?? req.video?.owner) !==
-  String(req.session.user?._id)
+export const videoAuthorizeMiddleware: RequestHandler = (req, res, next) => {
+  const { _id } = req.video.owner as TDocument<IUserDocument>;
+  String(_id ?? req.video.owner) !== String(req.session.user?._id)
     ? res.status(403).redirect("/")
     : next();
+};
+export const commentAuthorizeMiddleware: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const {
+    body: { id },
+  } = req;
+  req.comment = await getDocumentById({ model: Comment, id });
+  String(req.comment.owner) !== String(req.session.user?._id)
+    ? res.status(403).redirect("/")
+    : next();
+};
 
 export const videoValidateMiddleware = (view: string) => {
   const handler: RequestHandler = (req, res, next) => {

@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
-import { TDocument, TGHEmails } from "../shared/types";
-import User, { IUserDocument } from "../models/user.model";
+import { TGHEmails } from "../shared/types";
+import User from "../models/user.model";
 import bcrypt from "bcrypt";
 import { URLSearchParams } from "url";
 import fs from "fs";
@@ -18,10 +18,10 @@ export const postSignin: RequestHandler = async (req, res) => {
   } = req;
   locals.pageTitle = "Sign in";
 
-  const user = (await User.findOne({
+  const user = await User.findOne({
     username,
     socialOnly: false,
-  })) as TDocument<IUserDocument>;
+  });
   const isCompare =
     user && (await bcrypt.compare(password, user.password ?? ""));
   if (!user || !isCompare) {
@@ -67,6 +67,7 @@ export const postSignup: RequestHandler = async (req, res) => {
       location,
       avatarUrl: "",
       videos: [],
+      comments: [],
     });
     return res.redirect("/signin");
   } catch {
@@ -141,10 +142,12 @@ export const ghSigninAccess: RequestHandler = async (req, res) => {
         location,
         password: "",
         socialOnly: true,
+        videos: [],
+        comments: [],
       });
 
     session.loggedIn = true;
-    session.user = user as TDocument<IUserDocument>;
+    session.user = user;
     return res.redirect("/");
   } catch (err) {
     console.log(err);
@@ -164,20 +167,20 @@ export const postProfile: RequestHandler = async (req, res) => {
   } = req;
   locals.pageTitle = "User Profile";
 
-  const isEmail = user!.email !== email && (await User.exists({ email }));
+  const isEmail = user.email !== email && (await User.exists({ email }));
   const isUsername =
-    user!.username !== username && (await User.exists({ username }));
+    user.username !== username && (await User.exists({ username }));
   if (isEmail || isUsername) {
     locals.error = {
       user: "이름이나 이메일 중 이미 존제합니다.",
     };
     return res.status(400).render("users/profile");
   }
-  const isAvatar = fs.existsSync(user!.avatarUrl ?? "") || user!.socialOnly;
-  file && isAvatar && fs.rmSync(user!.avatarUrl ?? "");
-  const avatarUrl = file ? file.path : isAvatar ? user!.avatarUrl : "";
-  const updateUser = (await User.findByIdAndUpdate(
-    user!.id,
+  const isAvatar = fs.existsSync(user.avatarUrl ?? "") || user.socialOnly;
+  file && isAvatar && fs.rmSync(user.avatarUrl ?? "");
+  const avatarUrl = file ? file.path : isAvatar ? user.avatarUrl : "";
+  const updateUser = await User.findByIdAndUpdate(
+    user.id,
     {
       avatarUrl,
       name,
@@ -186,7 +189,7 @@ export const postProfile: RequestHandler = async (req, res) => {
       location,
     },
     { new: true }
-  )) as TDocument<IUserDocument>;
+  );
   req.session.user = updateUser!;
   return res.redirect("profile");
 };
@@ -202,7 +205,7 @@ export const postChangePassword: RequestHandler = async (req, res) => {
   } = req;
   const { locals } = res;
   locals.pageTitle = "Change Password";
-  const isCompare = await bcrypt.compare(curPassword, user!.password!);
+  const isCompare = await bcrypt.compare(curPassword, user.password!);
   if (!isCompare || password !== password2) {
     locals.error = {
       ...(!isCompare && { password: "기존 비밀번호가 맞지 않습니다." }),
@@ -212,15 +215,14 @@ export const postChangePassword: RequestHandler = async (req, res) => {
     };
     return res.status(400).render("users/change-password");
   }
-
-  user!.password = password;
-  user!.save();
+  user.password = password;
+  user.save();
   req.session.destroy(() => {});
   return res.redirect("/signin");
 };
 export const summary: RequestHandler = async (req, res) => {
   const { locals } = res;
   locals.pageTitle = "User Summary";
-  locals.user = req.user!;
+  locals.user = req.user;
   return res.render("users/summary");
 };

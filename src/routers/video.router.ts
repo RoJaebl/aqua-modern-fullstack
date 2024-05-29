@@ -28,7 +28,7 @@ videoRouter
   );
 videoRouter
   .route("/:id([0-9a-f]{24})")
-  .all(paramMiddleware("video", "owner"))
+  .all(paramMiddleware("video", ["owner", "comments"]))
   .get(watch);
 videoRouter
   .route("/:id([0-9a-f]{24})/edit")
