@@ -9,6 +9,7 @@ import proxy from "express-http-proxy";
 import MongoStore from "connect-mongo";
 import { notFoundMiddleware } from "./middlewares/route.middlware";
 import apiRouter from "./routers/api.router";
+import flash from "express-flash";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(
 );
 app.use(localsMiddleware);
 
+app.use(flash());
 app.use("/public", proxy("http://localhost:3000"));
 app.use("/uploads", express.static("uploads"));
 app.use("/ffmpeg", express.static("node_modules/@ffmpeg"));

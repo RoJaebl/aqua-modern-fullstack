@@ -1,0 +1,5 @@
+mixin flash()
+  if messages
+    each value, key in messages
+      div.flash-message(class=key)
+        span=value

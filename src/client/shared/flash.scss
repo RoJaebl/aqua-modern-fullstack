@@ -1,0 +1,7 @@
+.flash-message {
+  @apply absolute top-[-240px] left-0 right-0 my-0 mx-auto max-w-[250px] py-[10px] px-[20px] rounded-[15px] h-14 bg-white text-black cursor-pointer;
+  @apply flex items-center justify-center;
+  &.authority {
+    @apply bg-[#F55370] text-white;
+  }
+}
