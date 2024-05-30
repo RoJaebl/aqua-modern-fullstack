@@ -1,4 +1,4 @@
-import mongoose, { Model, Schema, Types } from "mongoose";
+import mongoose, { Model, Schema } from "mongoose";
 import { TDocument } from "../shared/types";
 import { ICommentDocument } from "./comment.model";
 import { IUserDocument } from "./user.model";

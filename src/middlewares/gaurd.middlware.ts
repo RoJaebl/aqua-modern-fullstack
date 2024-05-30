@@ -5,11 +5,15 @@ import { Response, TPopulatePath, TDocument } from "../shared/types";
 import { Model, Types } from "mongoose";
 import Comment from "../models/comment.model";
 
-export const authorizeMiddleware: RequestHandler = (req, res, next) =>
+export const authorizeMiddleware: RequestHandler = (req, res, next) => {
+  !req.session.user && req.flash("authority", "로그인을 하세요.");
   !req.session.user ? res.redirect("/signin") : next();
+};
 
-export const restrictMiddleware: RequestHandler = (req, res, next) =>
+export const restrictMiddleware: RequestHandler = (req, res, next) => {
+  req.session.user && req.flash("authority", "로그아웃 하세요.");
   req.session.user ? res.redirect("/") : next();
+};
 
 const $404 = (res: Response, message: string) => {
   res.locals.pageTitle = "404";
@@ -38,7 +42,9 @@ export const guardMiddleware: RequestHandler = async (req, res, next) => {
       id: req.session.user?._id,
     });
   } catch {
-    return $404(res, "사용자가 존제하지 않습니다.");
+    const message = "사용자를 찾을 수 없습니다.";
+    req.flash("404", message);
+    return $404(res, message);
   }
   next();
 };
@@ -56,12 +62,12 @@ export const paramMiddleware = (
         populatePath,
       });
     } catch {
-      return $404(
-        res,
+      const message =
         target === "video"
-          ? "비디오가 존제하지 않습니다."
-          : "사용자가 존제하지 않습니다."
-      );
+          ? "비디오를 찾을 수 없습니다."
+          : "사용자를 찾을 수 없습니다.";
+      req.flash("404", message);
+      return $404(res, message);
     }
     next();
   };

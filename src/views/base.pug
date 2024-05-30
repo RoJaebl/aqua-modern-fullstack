@@ -1,3 +1,5 @@
+include mixins/flash
+
 doctype html
 html(lang="ko")
   head
@@ -8,9 +10,11 @@ html(lang="ko")
     
     title #{pageTitle} | #{siteName}
   body 
+    +flash()
     include partials/header
     main
       block content
     include partials/footer
   script(src="/public/app/main.js")
+  script(src="/public/shared/shared.js")
   block scripts
