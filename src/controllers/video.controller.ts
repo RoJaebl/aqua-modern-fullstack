@@ -42,7 +42,8 @@ export const postUpload: RequestHandler = async (req, res) => {
     user.videos.push(newVidoe.id);
     user.save();
     return res.redirect("/");
-  } catch {
+  } catch (err) {
+    console.log(err);
     locals.error = {
       message: "비디오 생성에 실패하였습니다.",
     };
