@@ -3,7 +3,7 @@ import commonConfig from "./webpack.common";
 import { miniCssPlugin } from "./plugins";
 import { scriptRules, styleRules, pugRules } from "./rules";
 
-module.exports = merge(commonConfig, {
+export default merge(commonConfig, {
   mode: "production",
   module: {
     rules: [scriptRules, styleRules, pugRules],

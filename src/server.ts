@@ -11,6 +11,8 @@ import { notFoundMiddleware } from "./middlewares/route.middlware";
 import apiRouter from "./routers/api.router";
 import flash from "express-flash";
 
+const isDev = process.env.NODE_ENV === "development";
+
 const app = express();
 
 app.set("view engine", "pug");
@@ -31,7 +33,11 @@ app.use(
 app.use(localsMiddleware);
 
 app.use(flash());
-app.use("/public", proxy("http://localhost:3000"));
+
+app.use(
+  "/public",
+  isDev ? proxy("http://localhost:3000") : express.static("public")
+);
 app.use("/uploads", express.static("uploads"));
 app.use("/ffmpeg", express.static("node_modules/@ffmpeg"));
 
