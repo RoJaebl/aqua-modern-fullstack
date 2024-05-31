@@ -13,12 +13,12 @@ const s3 = new S3Client({
 
 const s3AvatarUpload = multerS3({
   s3,
-  bucket: "rojaebl-aqua-modern-fullstack/avatars",
+  bucket: "rojaebl-aqua-modern-fullstack",
   acl: "public-read",
 });
 const s3VideoUpload = multerS3({
   s3,
-  bucket: "rojaebl-aqua-modern-fullstack/videos",
+  bucket: "rojaebl-aqua-modern-fullstack",
   acl: "public-read",
 });
 
