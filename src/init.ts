@@ -1,5 +1,5 @@
 import "dotenv/config.js";
-import "./db.ts";
+import "./db";
 import app from "./server";
 
 app.listen(process.env.PORT!, () => {
