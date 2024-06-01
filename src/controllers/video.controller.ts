@@ -4,6 +4,9 @@ import User, { IUserDocument } from "../models/user.model";
 import fs from "fs";
 import Comment from "../models/comment.model";
 import { TDocument } from "../shared/types";
+import { removeFile } from "../middlewares/multer.middleware";
+
+const isDev = process.env.NODE_ENV === "development";
 
 export const home: RequestHandler = async (_, res) => {
   const { locals } = res;
@@ -23,27 +26,28 @@ export const postUpload: RequestHandler = async (req, res) => {
   const {
     body: { title, description, hashtags },
     user,
+    files,
   } = req;
-  const { video, thumb } = req.files!;
   locals.pageTitle = "Video Upload";
-  const fileUrl = video[0].path;
-  const thumbUrl = thumb[0].path;
-
+  const fileUrls = Object.entries(files!).reduce((acc, cur) => {
+    const propName = { video: "fileUrl", thumb: "thumbUrl" }[cur[0]]!;
+    return Object.assign(acc, {
+      [propName]: isDev ? "/" : "" + cur[1][0][isDev ? "path" : "location"],
+    });
+  }, {});
   try {
     const newVidoe = await Video.create({
       title,
-      fileUrl,
       description,
-      thumbUrl,
       hashtags: Video.formatHashtags(hashtags),
       owner: user.id,
       comments: [],
+      ...fileUrls,
     });
     user.videos.push(newVidoe.id);
     user.save();
     return res.redirect("/");
-  } catch (err) {
-    console.log(err);
+  } catch {
     locals.error = {
       message: "비디오 생성에 실패하였습니다.",
     };
@@ -76,9 +80,8 @@ export const postEdit: RequestHandler = async (req, res) => {
 export const remove: RequestHandler = async (req, res) => {
   const { _id: videoId, owner, fileUrl, thumbUrl } = req.video;
   const { _id: userId, videos } = owner as TDocument<IUserDocument>;
-
-  fileUrl && fs.rmSync(fileUrl);
-  thumbUrl && fs.rmSync(thumbUrl);
+  isDev ? fs.rmSync(fileUrl) : await removeFile(fileUrl);
+  isDev ? fs.rmSync(thumbUrl) : await removeFile(thumbUrl);
 
   videos.splice(videos.indexOf(videoId), 1);
   await Video.findByIdAndDelete(videoId);

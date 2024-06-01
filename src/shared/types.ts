@@ -26,12 +26,14 @@ declare global {
       };
       formData?: Record<any, String>;
     }
+    export interface IMulterFile extends Multer.File, Express.MulterS3.File {}
+
     export interface Request {
       user: TDocument<IUserDocument>;
       video: TDocument<IVideoDocument>;
       comment: TDocument<ICommentDocument>;
-      file?: Record<string, Multer.File>;
-      files?: Record<string, Multer.File[]>;
+      file?: Record<string, IMulterFile>;
+      files?: Record<string, IMulterFile[]>;
     }
   }
 }
