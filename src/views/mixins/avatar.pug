@@ -1,11 +1,8 @@
 mixin avatar(isName = true, style = "image")
   div&attributes(attributes).avatar-container
-    if user.socialOnly
-      img(src=user.avatarUrl class=`avatar__${style}`)
-    else 
-      if user.avatarUrl
-        img(src=`/${user.avatarUrl}` class=`avatar__${style}`)
-      else
-        div 😎
+    if user.avatarUrl
+      img(src=`${user.avatarUrl}` class=`avatar__${style}`)
+    else
+      div 😎
     if isName
      h3=user.name

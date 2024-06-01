@@ -4,6 +4,9 @@ import User from "../models/user.model";
 import bcrypt from "bcrypt";
 import { URLSearchParams } from "url";
 import fs from "fs";
+import { removeFile } from "../middlewares/multer.middleware";
+
+const isDev = process.env.NODE_ENV === "development";
 
 export const signin: RequestHandler = (_, res) => {
   const { locals } = res;
@@ -176,9 +179,12 @@ export const postProfile: RequestHandler = async (req, res) => {
     };
     return res.status(400).render("users/profile");
   }
-  const isAvatar = fs.existsSync(user.avatarUrl ?? "") || user.socialOnly;
-  file && isAvatar && fs.rmSync(user.avatarUrl ?? "");
-  const avatarUrl = file ? file.path : isAvatar ? user.avatarUrl : "";
+  const fileUrl = isDev ? file?.path : file?.location;
+  const isFile = typeof fileUrl !== "undefined";
+  isFile &&
+    user.avatarUrl &&
+    (isDev ? fs.rmSync(user.avatarUrl!) : await removeFile(user.avatarUrl!));
+  const avatarUrl = isFile ? fileUrl : user.avatarUrl;
   const updateUser = await User.findByIdAndUpdate(
     user.id,
     {
