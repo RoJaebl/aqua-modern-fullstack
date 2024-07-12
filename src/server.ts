@@ -40,6 +40,7 @@ app.use(
 );
 app.use("/uploads", express.static("uploads"));
 app.use("/ffmpeg", express.static("node_modules/@ffmpeg"));
+app.use("/.well-known", express.static(".well-known"));
 
 app.use("/", rootRouter);
 app.use("/users", userRouter);
