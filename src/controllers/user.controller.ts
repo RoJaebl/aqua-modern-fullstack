@@ -184,7 +184,7 @@ export const postProfile: RequestHandler = async (req, res) => {
   isFile &&
     user.avatarUrl &&
     (isDev ? fs.rmSync(user.avatarUrl!) : await removeFile(user.avatarUrl!));
-  const avatarUrl = isFile ? fileUrl : user.avatarUrl;
+  const avatarUrl = isFile ? (isDev ? "/" : "" + fileUrl) : user.avatarUrl;
   const updateUser = await User.findByIdAndUpdate(
     user.id,
     {
