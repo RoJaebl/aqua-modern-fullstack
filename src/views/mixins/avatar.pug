@@ -1,7 +1,7 @@
 mixin avatar(isName = true, style = "image")
   div&attributes(attributes).avatar-container
     if user.avatarUrl
-      img(src=`${user.avatarUrl}` class=`avatar__${style}`)
+      img(src=`${isDev ? "/": ""}${user.avatarUrl}` class=`avatar__${style}`)
     else
       div 😎
     if isName
