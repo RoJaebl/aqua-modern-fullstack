@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-mongoose.connect(process.env.DB_URL!);
+const isDev = process.env.NODE_ENV === "development";
+mongoose.connect(isDev ? process.env.DB_URL! : process.env.DB_URL_DEPLOY!);
 import "./models/user.model";
 import "./models/video.model";
 import "./models/comment.model";
