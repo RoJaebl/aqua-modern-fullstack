@@ -32,7 +32,7 @@ export const postUpload: RequestHandler = async (req, res) => {
   const fileUrls = Object.entries(files!).reduce((acc, cur) => {
     const propName = { video: "fileUrl", thumb: "thumbUrl" }[cur[0]]!;
     return Object.assign(acc, {
-      [propName]: isDev ? "/" : "" + cur[1][0][isDev ? "path" : "location"],
+      [propName]: cur[1][0][isDev ? "path" : "location"],
     });
   }, {});
   try {
