@@ -26,7 +26,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.DB_URL,
+      mongoUrl: isDev ? process.env.DB_URL! : process.env.DB_URL_DEPLOY!,
     }),
   })
 );
