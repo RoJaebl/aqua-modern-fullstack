@@ -5,7 +5,8 @@ require("./models/user.model");
 require("./models/video.model");
 require("./models/comment.model");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-_mongoose["default"].connect(process.env.DB_URL);
+var isDev = process.env.NODE_ENV === "development";
+_mongoose["default"].connect(isDev ? process.env.DB_URL : process.env.DB_URL_DEPLOY);
 var db = _mongoose["default"].connection;
 db.on("error", function (err) {
   return console.log("❌ DB Error: ", err);

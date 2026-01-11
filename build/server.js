@@ -31,7 +31,7 @@ app.use((0, _expressSession["default"])({
   resave: false,
   saveUninitialized: false,
   store: _connectMongo["default"].create({
-    mongoUrl: process.env.DB_URL
+    mongoUrl: isDev ? process.env.DB_URL : process.env.DB_URL_DEPLOY
   })
 }));
 app.use(_locals["default"]);
